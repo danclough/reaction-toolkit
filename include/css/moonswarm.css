@@ -1,0 +1,11 @@
+body {
+	padding-top: 50px;
+}
+.center, .clear {
+	display: table;
+	margin: 0 auto;
+}
+.clear {
+	clear: both;
+}
+
