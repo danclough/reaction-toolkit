@@ -15,10 +15,10 @@ $options = array(
     "o" => $_SESSION['params']['o'],
     "t" => $_SESSION['params']['t']
 );
-$form = new FormBuilder();
-$db = new DatabaseManager(true);
-$of = new ObjectFactory();
-$datetime = $db->getLastTimestamp(time(), 300);
+$dbMgr = new DatabaseManager(true);
+$objectFactory = new ObjectFactory();
+$formBuilder = new FormBuilder();
+$datetime = $dbMgr->getLastTimestamp(time(), 300);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,7 +53,7 @@ $datetime = $db->getLastTimestamp(time(), 300);
     ?>				<h1 class="center">Dashboard Options</h1>
                 </div>
                 <div class="center">
-                <?php $form->generateOptionsForm($scriptName, "Save", $options); ?>
+                <?php $formBuilder->generateOptionsForm($scriptName, "Save", $options); ?>
                 </div>
             <?php
             } else {
@@ -82,17 +82,17 @@ $datetime = $db->getLastTimestamp(time(), 300);
                     <button class="btn btn-success" type="submit" form="configure">Configure</button>
                     <button class="btn btn-danger" type="submit" form="reset">Reset</button>
                     <a class="btn btn-primary" href="
-            <?php $form->generatePermalink($options); ?>">Permalink</a>
+            <?php $formBuilder->generatePermalink($options); ?>">Permalink</a>
                 </div>
             </div>
             <?php
-            $system = $of->create(ObjectFactory::SYSTEM, $_SESSION['params']['sy']);
+            $system = $objectFactory->create(ObjectFactory::SYSTEM, $_SESSION['params']['sy']);
             $systemName = $system->getSystemName();
-            $numCycles = $db->getNumCycles($_SESSION['params']['t']);
-            $simpleReactions = $db->getAllReactionIDs(1);
-            $complexReactions = $db->getAllReactionIDs(2);
-            $alchemyReactions = $db->getAllReactionIDs(3);
-            $polymerReactions = $db->getAllReactionIDs(4);
+            $numCycles = $dbMgr->getNumCycles($_SESSION['params']['t']);
+            $simpleReactions = $dbMgr->getAllReactionIDs(1);
+            $complexReactions = $dbMgr->getAllReactionIDs(2);
+            $alchemyReactions = $dbMgr->getAllReactionIDs(3);
+            $polymerReactions = $dbMgr->getAllReactionIDs(4);
             ?>			<div class="center">
                 <img src="include/images/moonminingbee.png" alt="Moon mining bee wants your precious goo." style="width:200px;height:225px;float:right;" alt="">
                 <p>This dashboard shows real-time net income calculations for all simple and complex reactions. Assumptions are:</p>
@@ -152,7 +152,7 @@ $datetime = $db->getLastTimestamp(time(), 300);
                             <tbody>
                                 <?php
                                 foreach ($simpleReactions as $reactionID) {
-                                    $reaction = $of->create(ObjectFactory::REACTION, $reactionID);
+                                    $reaction = $objectFactory->create(ObjectFactory::REACTION, $reactionID);
                                     $typeID = $reaction->getOutput()->getID();
                                     $itemName = $reaction->getOutput()->getName();
                                     $itemDesc = htmlspecialchars($reaction->getOutput()->getDescription());
@@ -201,7 +201,7 @@ $datetime = $db->getLastTimestamp(time(), 300);
                             <tbody>
                                 <?php
                                 foreach ($complexReactions as $reactionID) {
-                                    $reaction = $of->create(ObjectFactory::REACTION, $reactionID);
+                                    $reaction = $objectFactory->create(ObjectFactory::REACTION, $reactionID);
                                     $typeID = $reaction->getOutput()->getID();
                                     $itemName = $reaction->getOutput()->getName();
                                     $itemDesc = htmlspecialchars($reaction->getOutput()->getDescription());
@@ -250,7 +250,7 @@ $datetime = $db->getLastTimestamp(time(), 300);
                             <tbody>
                                 <?php
                                 foreach ($complexReactions as $reactionID) {
-                                    $reaction = $of->create(ObjectFactory::REACTION, $reactionID);
+                                    $reaction = $objectFactory->create(ObjectFactory::REACTION, $reactionID);
                                     $typeID = $reaction->getOutput()->getID();
                                     $itemName = $reaction->getOutput()->getName();
                                     $itemDesc = htmlspecialchars($reaction->getOutput()->getDescription());
@@ -301,7 +301,7 @@ $datetime = $db->getLastTimestamp(time(), 300);
                             <tbody>
                                 <?php
                                 foreach ($alchemyReactions as $reactionID) {
-                                    $reaction = $of->create(ObjectFactory::REACTION, $reactionID);
+                                    $reaction = $objectFactory->create(ObjectFactory::REACTION, $reactionID);
                                     $typeID = $reaction->getOutput()->getID();
                                     $itemName = $reaction->getOutput()->getName();
                                     $itemDesc = htmlspecialchars($reaction->getOutput()->getDescription());
@@ -350,7 +350,7 @@ $datetime = $db->getLastTimestamp(time(), 300);
                             <tbody>
                                 <?php
                                 foreach ($polymerReactions as $reactionID) {
-                                    $reaction = $of->create(ObjectFactory::REACTION, $reactionID);
+                                    $reaction = $objectFactory->create(ObjectFactory::REACTION, $reactionID);
                                     $typeID = $reaction->getOutput()->getID();
                                     $itemName = $reaction->getOutput()->getName();
                                     $itemDesc = htmlspecialchars($reaction->getOutput()->getDescription());

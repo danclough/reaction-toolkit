@@ -20,9 +20,9 @@ else {
 	$systemID = 30000142;
 }
 
-$db = new DatabaseManager(true);
+$dbMgr = new DatabaseManager(true);
 
-$prices = $db->getSystemPrices($systemID);
+$prices = $dbMgr->getSystemPrices($systemID);
 
 foreach($prices as $row) {
 	echo "<tr>";
