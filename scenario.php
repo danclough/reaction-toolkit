@@ -5,12 +5,12 @@ $time = explode(' ', $time);
 $time = $time[1] + $time[0];
 $start = $time;
 $scriptName = basename($_SERVER['PHP_SELF']);
-$form = new FormBuilder();
-$db = new DatabaseManager(true);
-$of = new ObjectFactory();
+$dbMgr = new DatabaseManager(true);
+$objectFactory = new ObjectFactory();
+$formBuilder = new FormBuilder();
 if (isset($argArray['re'])) {
     $reactionID = $argArray['re'];
-    $reaction = $of->create(ObjectFactory::REACTION, $reactionID);
+    $reaction = $objectFactory->create(ObjectFactory::REACTION, $reactionID);
 }
 if (isset($argArray['c']) && ($reaction->getReactionType() == 2)) {
     $chain = 1;
@@ -20,10 +20,10 @@ if (isset($argArray['c']) && ($reaction->getReactionType() == 2)) {
     $chainStr = "Reaction";
 }
 if (isset($argArray['d'])) {
-    $datetime = $db->getLastTimestamp($argArray['d'],300);
+    $datetime = $dbMgr->getLastTimestamp($argArray['d'],300);
     $dateChanged = 1;
 } else {
-    $datetime = $db->getLastTimestamp(time(),300);
+    $datetime = $dbMgr->getLastTimestamp(time(),300);
 }
 $options = array(
     "r" => $_SESSION['params']['r'],
@@ -69,10 +69,10 @@ $options = array(
 				<h2 class="center"><small><?php echo $reaction->getOutput()->getName(); ?> Reaction</small></h2>
 			</div>
 			<div class="center">
-				<?php $form->generateResetButton($scriptName); ?>
+				<?php $formBuilder->generateResetButton($scriptName); ?>
 			</div>
 			<div class="center">
-                <?php $form->generateOptionsForm($scriptName,"Calculate",$options,$reactionID);?>
+                <?php $formBuilder->generateOptionsForm($scriptName,"Calculate",$options,$reactionID);?>
 			</div>
 <?php	} else {
         $scenario = new Scenario($reactionID,$chain,$datetime);
@@ -105,7 +105,7 @@ $options = array(
                 <div class="btn-group btn-group-xs">
                     <button class="btn btn-success" type="submit" form="configure">Configure</button>
                     <button class="btn btn-danger" type="submit" form="reset">Reset</button>
-                    <a class="btn btn-primary" href="<?php $form->generatePermalink($options,$reactionID,$chain);?>">Permalink</a>
+                    <a class="btn btn-primary" href="<?php $formBuilder->generatePermalink($options,$reactionID,$chain);?>">Permalink</a>
                 </div>
 			</div>
 			<br>
@@ -189,7 +189,7 @@ $options = array(
 				<h1 class="center">Reaction Scenario Calculator</h1>
 			</div>
 			<div class="center">
-				<?php $form->generateReactionSelectForm($scriptName,"Configure Options"); ?>
+				<?php $formBuilder->generateReactionSelectForm($scriptName,"Configure Options"); ?>
 			</div>
 <?php
 	}

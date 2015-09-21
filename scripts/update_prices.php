@@ -7,11 +7,11 @@ require_once('include/config/config.php');
 $filePath = __DIR__;
 $statusFile = "{$filePath}/../include/pages/price_update.txt";
 $status = "";
-$db = new DatabaseManager(false);
+$dbMgr = new DatabaseManager(false);
 $api = new MarketAPI();
 $source = $api->updatePrices();
 if ($source !== false):
-	$status = "Prices updated successfully from {$source} as of ".$db->getLastTimestamp(time())." EVE time (UTC).";
+	$status = "Prices updated successfully from {$source} as of ".$dbMgr->getLastTimestamp(time())." EVE time (UTC).";
 else:
 	$status = "Last price update failed.  Oops.";
 endif;

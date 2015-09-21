@@ -1,14 +1,10 @@
 <?php
 require_once('include/session_setup.php');
-require_once 'include/chart.php';
 $time = microtime();
 $time = explode(' ', $time);
 $time = $time[1] + $time[0];
 $start = $time;
 $scriptName = basename($_SERVER['PHP_SELF']);
-$db = new DatabaseManager(true);
-$of = new ObjectFactory();
-$form = new FormBuilder();
 $options = array(
     "r" => $_SESSION['params']['r'],
     "s" => $_SESSION['params']['s'],
@@ -20,6 +16,9 @@ $options = array(
     "t" => $_SESSION['params']['t'],
     "rn" => $_SESSION['params']['rn']
 );
+$dbMgr = new DatabaseManager(true);
+$objectFactory = new ObjectFactory();
+$formBuilder = new FormBuilder();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,7 +31,7 @@ $options = array(
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.js"></script>
 <?php if (isset($argArray['re'])) {
     $reactionID = $argArray['re'];
-    $reaction = $of->create(ObjectFactory::REACTION, $reactionID);
+    $reaction = $objectFactory->create(ObjectFactory::REACTION, $reactionID);
     $typeID = $reaction->getOutput()->getID();
     $itemName = $reaction->getOutput()->getName();
     $reactionType = $reaction->getReactionType();
@@ -81,10 +80,10 @@ $options = array(
 				<h2 class="center"><small><?php echo $itemName; ?> Reaction</small></h2>
 			</div>
 			<div class="center">	
-				<?php $form->generateResetButton($scriptName); ?>
+				<?php $formBuilder->generateResetButton($scriptName); ?>
 			</div>
 			<div class="center">
-			    <?php $form->generateOptionsForm($scriptName,"Calculate",$options,$reactionID); ?>
+			    <?php $formBuilder->generateOptionsForm($scriptName,"Calculate",$options,$reactionID); ?>
             </div>
         </div>
         <script src="include/javascript/bootstrap.min.js"></script>
@@ -113,26 +112,26 @@ $options = array(
 		switch ($_SESSION['params']['t']) {
 			case "d":
 				$timeframeStr = "Daily";
-				$numCycles = $db->getNumCycles($_SESSION['params']['t']);
+				$numCycles = $dbMgr->getNumCycles($_SESSION['params']['t']);
 				break;
 			case "w":
 				$timeframeStr = "Weekly";
-				$numCycles = $db->getNumCycles($_SESSION['params']['t']);
+				$numCycles = $dbMgr->getNumCycles($_SESSION['params']['t']);
 				break;
 			case "m":
 				$timeframeStr = "Monthly";
-				$numCycles = $db->getNumCycles($_SESSION['params']['t']);
+				$numCycles = $dbMgr->getNumCycles($_SESSION['params']['t']);
 				break;
 		}
-        $numCycles = $db->getNumCycles($_SESSION['params']['t']);
+        $numCycles = $dbMgr->getNumCycles($_SESSION['params']['t']);
 		$graphTitle = "{$itemName} {$chainStr} Historical {$timeframeStr} Net Income";
 		
 		$historicalData = array();
 		for ($x = 0; $x < $numResults; $x++) {
-            $datetime = $db->getLastTimestamp(time()-($modulo*$x),$modulo);
+            $datetime = $dbMgr->getLastTimestamp(time()-($modulo*$x),$modulo);
             switch ($_SESSION['params']['rn']) {
                 case "d":
-                    $datetime = $db->getLastTimestamp(time()-($modulo*$x),$modulo);
+                    $datetime = $dbMgr->getLastTimestamp(time()-($modulo*$x),$modulo);
                     break;
                 case "m":
                     $datetime = date("Y-m-d",strtotime($datetime));
@@ -202,7 +201,7 @@ $options = array(
                 <div class="btn-group btn-group-xs">
                     <button class="btn btn-success" type="submit" form="configure">Configure</button>
                     <button class="btn btn-danger" type="submit" form="reset">Reset</button>
-                    <a class="btn btn-primary" href="<?php $form->generatePermalink($options,$reactionID,$chain);?>">Permalink</a>
+                    <a class="btn btn-primary" href="<?php $formBuilder->generatePermalink($options,$reactionID,$chain);?>">Permalink</a>
                 </div>
             </div>
 			<div class="center">
@@ -267,7 +266,7 @@ $options = array(
                 <h1 class="center">Historical Trend Report</h1>
             </div>
             <div class="center">
-			    <?php $form->generateReactionSelectForm($scriptName,"Configure Options"); ?>
+			    <?php $formBuilder->generateReactionSelectForm($scriptName,"Configure Options"); ?>
 		    </div>
         </div>
         <script src="include/javascript/bootstrap.min.js"></script>

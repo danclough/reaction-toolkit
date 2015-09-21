@@ -54,13 +54,13 @@ class Reaction {
         $this->reactionID = $objectData['reactionID'];
         $this->reactionType = $objectData['reactionType'];
         $this->inputs = $dbMgr->getReactionInputs($this->reactionID);
-        $of = new ObjectFactory();
+        $objectFactory = new ObjectFactory();
         foreach ($this->inputs as $input) {
-            $inputType = $of->create(ObjectFactory::TYPE, $input['typeID']);
+            $inputType = $objectFactory->create(ObjectFactory::TYPE, $input['typeID']);
             $inputVolume = $inputType->getVolume() * $input['inputQty'];
             $this->inputVolume += $inputVolume;
         }
-        $this->output = $of->create(ObjectFactory::TYPE, $objectData['typeID']);
+        $this->output = $objectFactory->create(ObjectFactory::TYPE, $objectData['typeID']);
         $this->outputQty = $objectData['outputQty'];
         $this->outputVolume = $this->outputQty * $this->output->getVolume();
         $this->reactionName = $this->output->getName();

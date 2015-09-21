@@ -21,12 +21,12 @@
 			</div>
 <?php
 require_once('include/session_setup.php');
-$form = new FormBuilder();
+$objectFactory = new ObjectFactory();
+$formBuilder = new FormBuilder();
 $scriptName = basename($_SERVER['PHP_SELF']);
 if (isset($_POST['re'])) {
 	$reactionID = $_POST['re'];
-        $of = new ObjectFactory();
-        $reaction = $of->create(ObjectFactory::REACTION, $reactionID);
+        $reaction = $objectFactory->create(ObjectFactory::REACTION, $reactionID);
 	$reactionType = $reaction->getReactionType();
 	if ($reactionType == 3) {
 		$reactionName = $reaction->getOutput()->getName()." Alchemy";
@@ -58,7 +58,7 @@ if (isset($_POST['re'])) {
 ?>
 						<tr>
 							<td><?php
-                                $thisInput = $of->create(ObjectFactory::TYPE, $input['typeID']);
+                                $thisInput = $objectFactory->create(ObjectFactory::TYPE, $input['typeID']);
                                 echo $thisInput->getName();
                                 ?></td>
 							<td align=right><?php echo $input['inputQty']; ?></td>
@@ -70,7 +70,7 @@ if (isset($_POST['re'])) {
 <?php
 } else {
 ?>			<div class="center">
-				<?php $form->generateReactionSelectForm($scriptName,"Lookup"); ?>
+				<?php $formBuilder->generateReactionSelectForm($scriptName,"Lookup"); ?>
 			</div>
 <?php }
 ?>		</div>
