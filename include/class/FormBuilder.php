@@ -1,20 +1,15 @@
 <?php
 
-class Form {
-    private $db, $memCache;
+class FormBuilder {
+    private $dbMgr, $factory;
 
     public function __construct() {
-        $this->db = new Database();
-
-        $this->memCache = NULL;
-        if(USE_MEMCACHED) {
-            $this->memCache = new Memcache();
-            $this->memCache->connect(MEMCACHED_HOST, MEMCACHED_PORT);
-        }
+        $this->factory = new ObjectFactory();
+        $this->dbMgr = new DatabaseManager(true);
     }
 
     public function generateReactionSelectForm($scriptName,$buttonText) {
-        $reactions = $this->db->getAllReactions();
+        $reactions = $this->dbMgr->getAllReactions();
         echo "<form class=\"form-horizontal\" action=\"{$scriptName}\" method=\"post\">";
         echo "<div class=\"form-group form-group-sm\">";
         echo "<input type=hidden name=\"configure\" value=\"1\">";
@@ -63,7 +58,7 @@ class Form {
         echo "<div class=\"form-group form-group-sm\">";
         echo "<input type=\"hidden\" name=\"configured\" value=\"1\">";
         if (isset($reactionID)) {
-            $reaction = new Reaction($reactionID);
+            $reaction = $this->factory->create(ObjectFactory::REACTION, $reactionID);
             echo "<input type=\"hidden\" name=\"re\" value=\"{$reactionID}\">";
         }
         foreach ($options as $optionName => $currentValue) {
@@ -134,7 +129,7 @@ class Form {
                 endif;
                 break;
             case "sy":
-                $systems = $this->db->getAllSystems();
+                $systems = $this->dbMgr->getAllSystems();
                 echo "<label class=\"col-xs-8 control-label\" for=\"sy\">Market System</label><div class=\"col-xs-4\"><select class=\"form-control\" name=\"sy\" id=\"sy\">";
                 foreach ($systems as $thisSystemID => $thisSystemName) {
                     if ($currentValue == $thisSystemID):

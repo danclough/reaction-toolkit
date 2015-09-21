@@ -20,7 +20,7 @@ else {
 	$systemID = 30000142;
 }
 
-$db = new Database();
+$db = new DatabaseManager(true);
 
 $prices = $db->getSystemPrices($systemID);
 

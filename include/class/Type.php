@@ -1,37 +1,44 @@
 <?php
+
 class Type {
-    private $typeID, $db, $name, $volume, $description;
 
-    public function __construct($typeID)
-    {
-        $this->typeID = $typeID;
-        $this->db = new Database();
+    private $typeID, $typeName, $typeVolume, $typeDescription;
 
-        $row = $this->db->getItemData($this->typeID);
-        if (isset($row)) {
-            $this->name = $row['itemName'];
-            $this->volume = $row['itemVol'];
-            $this->description = $row['itemDesc'];
-        }
+    public function __construct($typeID) {
+        $dbMgr = new DatabaseManager(true);
+        $objectData = $dbMgr->getTypeData($typeID);
+        $this->typeID = $objectData['typeID'];
+        $this->typeName = $objectData['itemName'];
+        $this->typeVolume = $objectData['itemVol'];
+        $this->typeDescription = $objectData['itemDesc'];
+        $dbMgr = null;
     }
 
-    public function getTypeID() {
+    public function __sleep() {
+        return array('typeID', 'typeName', 'typeVolume', 'typeDescription');
+    }
+
+    public function getID() {
         return $this->typeID;
     }
 
     public function getName() {
-        return $this->name;
+        return $this->typeName;
     }
 
     public function getVolume() {
-        return $this->volume;
+        return $this->typeVolume;
     }
 
     public function getDescription() {
-        return $this->description;
+        return $this->typeDescription;
     }
 
-    public function getPrice($systemID,$datetime,$priceType,$loopCount = 0) {
-            return $this->db->getPrice($this->typeID,$systemID,$datetime,$priceType,$loopCount);
+    public function getPrice($systemID, $datetime, $priceType) {
+        $dbMgr = new DatabaseManager(true);
+        $price = $dbMgr->getPrice($this->typeID, $systemID, $datetime, $priceType);
+        $dbMgr = null;
+        return $price;
     }
-} 
+
+}
