@@ -1,5 +1,4 @@
 <?php
-require_once('config/config.php');
 
 /**
  * Calculate median of all values in an array.
@@ -19,11 +18,19 @@ function calculate_median($array) {
 			$median = (($low+$high)/2);
 		}
 	}
-	elseif ($count >0) {
+	elseif ($count > 0) {
 		return $array[0];
 	}
 	else {
 		$median = 0;
 	}
 	return $median;
+}
+
+function formatAsISK($number) {
+    return number_format($number,2)." ISK";
+}
+
+function formatAsM3($number) {
+    return number_format($number,2)." m³";
 }

@@ -6,9 +6,9 @@ $time = explode(' ', $time);
 $time = $time[1] + $time[0];
 $start = $time;
 $scriptName = basename($_SERVER['PHP_SELF']);
-$db = new Database();
-$form = new Form();
-$fmt = new Formatter();
+$db = new DatabaseManager(true);
+$of = new ObjectFactory();
+$form = new FormBuilder();
 $options = array(
     "r" => $_SESSION['params']['r'],
     "s" => $_SESSION['params']['s'],
@@ -32,8 +32,8 @@ $options = array(
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.js"></script>
 <?php if (isset($argArray['re'])) {
     $reactionID = $argArray['re'];
-    $reaction = new Reaction($reactionID);
-    $typeID = $reaction->getOutput()->getTypeID();
+    $reaction = $of->create(ObjectFactory::REACTION, $reactionID);
+    $typeID = $reaction->getOutput()->getID();
     $itemName = $reaction->getOutput()->getName();
     $reactionType = $reaction->getReactionType();
     switch ($reactionType) {
@@ -231,7 +231,7 @@ $options = array(
 <?php			} else {
 ?>								<td class="danger">
 <?php			}
-?>									<?php echo $fmt->formatAsISK($netIncome); ?>
+?>									<?php echo formatAsISK($netIncome); ?>
 									<form class="form-inline" style="display:inline" name="submitForm" method="POST" action="scenario.php">
 										<input type="hidden" name="re" value="<?php echo $reactionID; ?>">
 										<input type="hidden" name="c" value="<?php echo $chain; ?>">

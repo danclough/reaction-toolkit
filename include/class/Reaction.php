@@ -1,157 +1,110 @@
 <?php
+
+/**
+ * Represents a certain reaction.
+ * 
+ * The Reaction class contains details on a given reaction, including inputs and
+ * outputs, quantities, volumes, and other relevant data.
+ */
 class Reaction {
-	private $db, $dbPrefix, $memCache;
-    private $reactionID, $reactionType, $reactionName, $inputs, $output, $outputQty;
-    private $inputVolume, $outputVolume;
-	
-	public function __construct($reactionID) {
-        $this->dbPrefix=DATABASE_PREFIX;
-        try {
-            // Create database object
-            $this->db = new PDO("mysql:host=" . DATABASE_HOST . ";dbname=" . DATABASE_NAME . ";charset=utf8", DATABASE_USERNAME, DATABASE_PASSWORD);
-            // PDO Security and Error Handling settings
-            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-        } catch (Exception $e) {
-            echo "Failed to connect to database.  " . $e->getMessage() . " (Code ".$e->getCode().")";
+
+    /**
+     * @var int $reactionID The unique ID of this reaction type.
+     */
+    private $reactionID = null;
+
+    /**
+     * @var int $reactionType An integer representing the class of reaction.
+     */
+    private $reactionType = null;
+
+    /**
+     * @var string $reactionName The descriptive name of this reaction type.
+     */
+    private $reactionName = null;
+
+    /**
+     * @var Array $inputs An array of required inputs to perform this reaction.
+     */
+    private $inputs = null;
+
+    /**
+     * @var Type $output A Type object of the reaction's output.
+     */
+    private $output = null;
+
+    /**
+     * @var int $outputQty How many items of output are created from a single cycle.
+     */
+    private $outputQty = null;
+
+    /**
+     * @var int $inputVolume The total volume of inputs required for a single cycle. 
+     */
+    private $inputVolume = null;
+
+    /**
+     * @var int $outputVolume The total volume of output created from a single cycle. 
+     */
+    private $outputVolume = null;
+
+    public function __construct($reactionID) {
+        $dbMgr = new DatabaseManager(true);
+        $objectData = $dbMgr->getReactionData($reactionID);
+        $this->reactionID = $objectData['reactionID'];
+        $this->reactionType = $objectData['reactionType'];
+        $this->inputs = $dbMgr->getReactionInputs($this->reactionID);
+        $of = new ObjectFactory();
+        foreach ($this->inputs as $input) {
+            $inputType = $of->create(ObjectFactory::TYPE, $input['typeID']);
+            $inputVolume = $inputType->getVolume() * $input['inputQty'];
+            $this->inputVolume += $inputVolume;
         }
-
-        if(USE_MEMCACHED) {
-            $this->memCache = new Memcache();
-            $this->memCache->connect(MEMCACHED_HOST, MEMCACHED_PORT);
+        $this->output = $of->create(ObjectFactory::TYPE, $objectData['typeID']);
+        $this->outputQty = $objectData['outputQty'];
+        $this->outputVolume = $this->outputQty * $this->output->getVolume();
+        $this->reactionName = $this->output->getName();
+        if ($this->reactionType == 3) {
+            $this->reactionName += " Alchemy";
         }
-
-        $this->reactionID = $reactionID;
-
-        $functionCall = __METHOD__."({$reactionID})";
-
-        //Query DB for reaction inputs and quantities
-        $key = hash("md5",$functionCall);
-        if (USE_MEMCACHED) {
-            // Check memcache for this particular call
-            $cachedResult = $this->memCache->get($key);
-            if ($cachedResult !== FALSE) {
-                // Cache hit
-            }
-        }
-
-        $sql = <<<EOT
-SELECT *
-FROM {$this->dbPrefix}_reactions
-WHERE {$this->dbPrefix}_reactions.reactionID=:reactionID;
-EOT;
-        $query = $this->db->prepare($sql);
-        $query->bindParam(":reactionID",$this->reactionID,PDO::PARAM_INT);
-
-        if ($query->execute()) {
-            if ($row = $query->fetch(PDO::FETCH_ASSOC)) {
-                $this->output = new Type($row['typeID']);
-                $this->outputQty = $row['outputQty'];
-                $this->reactionType = $row['reactionType'];
-            } else {
-                throw new Exception("Unable to locate a reaction with reactionID={$this->reactionID} in the database.");
-            }
-        } else {
-            throw new Exception("An error occurred while trying to query the database.");
-        }
+        $dbMgr = null;
     }
 
-	/**
-	 * Return an associative array of all inputs for this reaction.
-	 * @return	array	(1D array if $chain = 0, 2D array if $chain = 1)
-	 */
-	public function getInputs() {
-        if (!isset($this->inputs)) {
-            $functionCall = __METHOD__."({$this->reactionID})";
-
-            //Query DB for reaction inputs and quantities
-            $key = hash("md5",$functionCall);
-            if (USE_MEMCACHED) {
-                // Check memcache for this particular call
-                $cachedResult = $this->memCache->get($key);
-                if ($cachedResult !== FALSE) {
-                    // Cache hit
-                    $this->inputs = $cachedResult;
-                    return $this->inputs;
-                }
-            }
-
-            $sql = <<<EOT
-SELECT {$this->dbPrefix}_inputs.typeID, {$this->dbPrefix}_inputs.inputQty
-FROM {$this->dbPrefix}_inputs
-WHERE {$this->dbPrefix}_inputs.reactionID=:reactionID;
-EOT;
-            $query = $this->db->prepare($sql);
-            $query->bindParam(":reactionID",$this->reactionID,PDO::PARAM_INT);
-
-            $this->inputs = array();
-            if ($query->execute()) {
-                $this->inputs = $query->fetchAll(PDO::FETCH_ASSOC);
-                if (USE_MEMCACHED && count($this->inputs) > 0) {
-                    $this->memCache->set($key, $this->inputs, 0, 86400);
-                }
-            }
-        }
-		return $this->inputs;
-	}
-
-    public function getOutput() {
-        if (isset($this->output)) {
-            return $this->output;
-        }
-        return null;
+    public function __sleep() {
+        return array('reactionID', 'reactionType', 'reactionName', 'inputs',
+            'output', 'outputQty', 'inputVolume', 'outputVolume');
     }
 
-    public function getReactionName() {
-        switch ($this->reactionType) {
-            case 3:
-                return $this->output->getName()." Alchemy";
-                break;
-            default:
-                return $this->output->getName();
-                break;
-        }
+    public function getReactionID() {
+        return $this->reactionID;
     }
 
     public function getReactionType() {
-        if (isset($this->reactionType)) {
-            return $this->reactionType;
-        }
-        return null;
+        return $this->reactionType;
     }
 
-	/**
-	* Query database to determine total input volume of a reaction.
-	* @return	int
-	*/
-	public function getInputVolume() {
-        if (!isset($this->inputVolume)) {
-            $totalVolume = 0;
-            foreach ($this->inputs as $input) {
-                $inputObject = new Type($input['typeID']);
-                $inputVolume = $inputObject->getVolume() * $input['inputQty'];
-                $totalVolume += $inputVolume;
-            }
-            $this->inputVolume = $totalVolume;
-        }
-        return $this->inputVolume;
-	}
+    public function getReactionName() {
+        return $this->reactionName;
+    }
 
-	/**
-	* Query database to determine total output volume of a reaction.
-	* @return float
-	*/
-	public function getOutputVolume() {
-        if (!isset($this->outputVolume)) {
-            $this->outputVolume = $this->outputQty * $this->output->getVolume();
-        }
-        return $this->outputVolume;
-	}
+    public function getInputs() {
+        return $this->inputs;
+    }
+
+    public function getOutput() {
+        return $this->output;
+    }
 
     public function getOutputQty() {
-        if (isset($this->outputQty)) {
-            return $this->outputQty;
-        }
-        return null;
+        return $this->outputQty;
     }
+
+    public function getInputVolume() {
+        return $this->inputVolume;
+    }
+
+    public function getOutputVolume() {
+        return $this->outputVolume;
+    }
+
 }

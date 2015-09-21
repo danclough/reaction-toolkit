@@ -5,11 +5,12 @@ $time = explode(' ', $time);
 $time = $time[1] + $time[0];
 $start = $time;
 $scriptName = basename($_SERVER['PHP_SELF']);
-$form = new Form();
-$db = new Database();
+$form = new FormBuilder();
+$db = new DatabaseManager(true);
+$of = new ObjectFactory();
 if (isset($argArray['re'])) {
     $reactionID = $argArray['re'];
-    $reaction = new Reaction($reactionID);
+    $reaction = $of->create(ObjectFactory::REACTION, $reactionID);
 }
 if (isset($argArray['c']) && ($reaction->getReactionType() == 2)) {
     $chain = 1;

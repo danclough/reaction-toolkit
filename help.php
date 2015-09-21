@@ -22,7 +22,7 @@
 				<p>The Reaction Toolkit is a web-based utility I wrote in a fit of rage when Google Sheets stopped updating my XML price feeds for the 80th time.&nbsp;&nbsp;The goal of the Reaction Toolkit is to automate the tedious math involved in computing profits for reactions in EVE Online.&nbsp;&nbsp;The Reaction Toolkit does this by analyzing market data and crunching numbers to determine the profitability of a reaction or reaction chain.</p>
 				<p>There are several components that make up the toolkit.&nbsp;&nbsp;Please see below for detailed explanations.</p>
 				<h4>The Dashboard</h4>
-				<p>The Reaction Analysis Dashboard is the core of the toolkit.&nbsp;&nbsp;The dashboard displays current net income statistics for every possible reaction in EVE, including Alchemy and Polymers.&nbsp;&nbsp;Drugs<p>
+				<p>The Reaction Analysis Dashboard is the core of the toolkit.&nbsp;&nbsp;The dashboard displays current net income statistics for every possible reaction in EVE, including Alchemy and Polymers.<p>
 				<p>You'll notice that next to each Net Income figure on the dashboard is a set of clickable icons. Here's what they do:</p>
 				<dl class="dl-horizontal">
 					<dt><img src='include/images/report.svg' width='16' height='16'> Scenario Report</dt>
@@ -40,7 +40,7 @@
 					<dt>Output Price</dt><dd>Min Sell</dd>
 					<dt>Timeframe</dt><dd>Monthly</dd>
 				</dl>
-				<p>These settings can be modified by clicking the Change Options button at the top of the page.</p>
+				<p>These settings can be modified by clicking the Configure button at the top of the page.</p>
 				<h4>Reaction Scenario</h4>
 				<p>The Reaction Scenario calculator provides a detailed breakdown and profitability analysis of a particular reaction or reaction chain.&nbsp;&nbsp;Every cost is taken into account to determine the profitability of a particular reaction.&nbsp;&nbsp;The Reaction Scenario calculator can be accessed from the menu bar, and will allow you to create a new scenario from scratch.&nbsp;&nbsp;Alternatively, clicking the Scenario Report icon on the Dashboard will take you straight to the report for a given reaction.</p>
 				<h4>Historical Trends</h4>

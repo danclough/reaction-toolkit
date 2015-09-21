@@ -7,7 +7,7 @@ require_once('include/config/config.php');
 $filePath = __DIR__;
 $statusFile = "{$filePath}/../include/pages/price_update.txt";
 $status = "";
-$db = new Database();
+$db = new DatabaseManager(false);
 $api = new MarketAPI();
 $source = $api->updatePrices();
 if ($source !== false):
