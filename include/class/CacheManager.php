@@ -10,20 +10,40 @@ class CacheManager {
      */
     private $cache = null;
 
-    public function __construct() {
+    public function __construct($persistent = true) {
         /*
          * Caching can be disabled in the config file if you aren't able to run
          * a memcached instance.  In that case this class will still get used,
          * but we will pretend that we have a perpetually empty cache.
          */
         if (defined("USE_MEMCACHED") && USE_MEMCACHED != false) {
-            $this->cache = new Memcached();
-            $this->cache->addServer(MEMCACHED_HOST, MEMCACHED_PORT);
+            $servers = null;
+            if ($persistent === true) {
+                /*
+                 * Since prefix should be unique across RTK installations, we can
+                 * use the server hostname + port + prefix as a persistent ID.
+                 * Hostname + port are included because otherwise changing the
+                 * memcached server would NOT change the persistent connection,
+                 * and you'd end up using the old server.
+                 */
+                $persistentID = MEMCACHED_HOST . ":" . MEMCACHED_PORT . "_" . MEMCACHED_PREFIX;
+                $this->cache = new Memcached($persistentID);
+                $serverList = $this->cache->getServerList();
+                foreach ($serverList as $entry) {
+                    $servers[] = $entry['host'] . ":" . $entry['port'];
+                }
+            } else {
+                //Not running Memcached in persistent mode.
+                $this->cache = new Memcached();
+            }
+            if ($persistent !== true || !is_array($servers) || !in_array(MEMCACHED_HOST . ":" . MEMCACHED_PORT, $servers)) {
+                $this->cache->addServer(MEMCACHED_HOST, MEMCACHED_PORT);
+            }
         }
     }
-    
+
     public function __destruct() {
-        //Explicitly terminate active memcached connection.
+        //Terminate active memcached connection.
         if (isset($this->cache)) {
             $this->cache->quit();
         }
@@ -32,11 +52,9 @@ class CacheManager {
     /**
      * Checks the cache for the presence of a given key.
      * 
-     * Memcached does not have a supported method to check if a key is cached,
-     * so internally this method just calls the load() function and checks what
-     * was returned to determine if the load was successful.  Note that storing
-     * boolean values of "false" in the cache will always result in a false
-     * negative, as Memcached returns false when no key exists.
+     * Memcached does not have a built-in method to check if a key is cached,
+     * so internally this method just calls the load() function and checks the
+     * result code via Memcached::getResultCode().
      * 
      * @param string $key The key to check.
      * @return boolean TRUE if the requested key is cached, FALSE otherwise.
@@ -44,7 +62,7 @@ class CacheManager {
     public function isCached($key) {
         if (isset($this->cache)) {
             $result = $this->load($key);
-            if (!is_bool($result) || $result === true) {
+            if ($this->cache->getResultCode() == Memcached::RES_SUCCESS) {
                 return true;
             }
         }
@@ -81,4 +99,4 @@ class CacheManager {
         return false;
     }
 
-} 
+}
