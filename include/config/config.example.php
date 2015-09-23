@@ -11,8 +11,10 @@ define("DATABASE_PASSWORD", "<changeme>"); //The password for the specified user
 /*
  * If using RTK in a shared hosting environment or anywhere else that limits database creation, you can configure a
  * prefix to be prepended to all table names.
+ * If you choose to enable this, you'll need to modify the included schema.sql
+ * file before importing the table definitions.
  */
-define("DATABASE_PREFIX", "rtk");
+//define("DATABASE_PREFIX", "rtk");
 
 /*
  * Memcached configuration
@@ -26,8 +28,9 @@ define("MEMCACHED_PORT", 11211); //The port on which Memcached is listening.
  * If your Memcached instance is shared among multiple applications, you can configure a unique ID that RTK will prepend
  * to all keys to avoid key collisions.
  *
- * Keys are also hashed with sha1, but this is just another level of safety in case you're running multiple copies of
- * RTK.
+ * Keys are also hashed with sha1, but this is just another level of safety in
+ * case you're running multiple copies of the toolkit, because the keys would
+ * otherwise be identical.
  */
 define("MEMCACHED_PREFIX", "RTK");
 
@@ -51,5 +54,5 @@ function __autoload($class_name) {
 }
 
 require_once('include/functions.php');
-ini_set('display_errors', 'on'); //On = Debugging output in the browser.  Off = Nothing to see here, move along.
+ini_set('display_errors', 'off'); //On = Debugging output in the browser.  Off = Nothing to see here, move along.
 date_default_timezone_set('UTC'); //All EVE Online systems are in UTC.  You really don't want to change this.
