@@ -93,6 +93,17 @@ class Calculator {
         return $this->inputVolume;
     }
 
+    public function getHourlyOutputQty() {
+        if (!isset($this->outputQty)) {
+            if ($this->chain) {
+                $this->outputQty = 2*$this->reaction->getOutputQty();
+            } else {
+                $this->outputQty = $this->reaction->getOutputQty();
+            }
+        }
+        return $this->outputVolume;
+    }
+
     public function getHourlyOutputVolume() {
         if (!isset($this->outputVolume)) {
             if ($this->chain) {
@@ -150,16 +161,7 @@ class Calculator {
             if ($this->cacheMgr->isCached($key)) {
                 $this->hourlyRevenue = $this->cacheMgr->load($key);
             } else {
-                $numReactors = 1;
-                $outputQty = $this->reaction->getOutputQty();
-
-                if ($this->chain) {
-                    $numReactors = 2;
-                }
-
-                $revenue = $this->output->getPrice($this->systemID, $this->datetime, $this->oPrice) * $outputQty * $numReactors;
-
-                $this->hourlyRevenue = $revenue;
+                $this->hourlyRevenue = $this->output->getPrice($this->systemID, $this->datetime, $this->oPrice) * $this->getHourlyOutputQty();
                 $this->cacheMgr->save($key,$this->hourlyRevenue,300);
             }
         }
