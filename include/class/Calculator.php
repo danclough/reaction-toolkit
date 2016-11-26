@@ -3,7 +3,7 @@ class Calculator {
     private $reaction, $dbMgr, $numCycles, $chain, $systemID, $datetime, $iPrice, $fPrice, $oPrice, $timeframe;
     private $hourlyRevenue, $hourlyFuelVolume, $hourlyFuelCost, $hourlyInputCost, $numTowers, $hourlyNetIncome;
     private $inputs, $inputVolume;
-    private $output, $outputVolume;
+    private $output, $outputVolume, $outputQuantity;
     private $cacheMgr;
     private $factory;
     private $instanceID;
@@ -94,14 +94,14 @@ class Calculator {
     }
 
     public function getHourlyOutputQty() {
-        if (!isset($this->outputQty)) {
+        if (!isset($this->outputQuantity)) {
             if ($this->chain) {
-                $this->outputQty = 2*$this->reaction->getOutputQty();
+                $this->outputQuantity = 2*$this->reaction->getOutputQty();
             } else {
-                $this->outputQty = $this->reaction->getOutputQty();
+                $this->outputQuantity = $this->reaction->getOutputQty();
             }
         }
-        return $this->outputVolume;
+        return $this->outputQuantity;
     }
 
     public function getHourlyOutputVolume() {

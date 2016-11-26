@@ -61,8 +61,8 @@ class Reaction {
             $this->inputVolume += $inputVolume;
         }
         $this->output = $objectFactory->create(ObjectFactory::TYPE, $objectData['typeID']);
-        $this->outputQty = $objectData['outputQty'];
-        $this->outputVolume = $this->outputQty * $this->output->getVolume();
+        $this->outputQuantity = $objectData['outputQty'];
+        $this->outputVolume = $this->outputQuantity * $this->output->getVolume();
         $this->reactionName = $this->output->getName();
         if ($this->reactionType == 3) {
             $this->reactionName += " Alchemy";
@@ -96,7 +96,7 @@ class Reaction {
     }
 
     public function getOutputQty() {
-        return $this->outputQty;
+        return $this->outputQuantity;
     }
 
     public function getInputVolume() {
