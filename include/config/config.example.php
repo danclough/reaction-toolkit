@@ -38,6 +38,7 @@ define("MEMCACHED_PREFIX", "RTK");
  * General toolkit configuration
  */
 define("DEFAULT_SYSTEMID", 30000142); // The default systemID to use for new sessions or where systemID is unspecified.
+define("DEFAULT_DATASOURCE", "evemd-json"); // The market data source to prefer.  See include/class/MarketAPI.php for options.
 
 /*
  * ===========================================================================

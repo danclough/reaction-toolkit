@@ -52,6 +52,13 @@ class MarketAPI {
             'evemd-json' => $this->evemdJSON
         );
         $this->dbMgr = new DatabaseManager(true);
+        // Set default market data source from config
+        // If not defined or invalid, fallback to EVE-Marketdata
+        if (defined("DEFAULT_DATASOURCE") && array_key_exists(DEFAULT_DATASOURCE, $this->apiTargets)) {
+            $this->primaryTarget = DEFAULT_DATASOURCE;
+        } else {
+            $this->primaryTarget = "evemd-json";
+        }
     }
 
     /**
@@ -61,7 +68,7 @@ class MarketAPI {
      *
      * @param	string	$target	A valid endpoint that exists in the apiTargets array.
      *
-     * @return	bool	True/false indicating whether the change was successful.
+     * @return	bool 	True/false indicating whether the change was successful.
      */
     public function setPrimaryTarget($target) {
         // 
